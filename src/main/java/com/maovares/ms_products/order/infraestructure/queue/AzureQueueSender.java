@@ -44,7 +44,8 @@ public class AzureQueueSender implements OrderQueueSender {
 
     @Override
     public void sendMessage(String message) {
-        getQueueClient().sendMessage(message);
+        String base64Message = java.util.Base64.getEncoder().encodeToString(message.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        getQueueClient().sendMessage(base64Message);
         logger.info("Message sent to Azure Queue '{}'", queueName);
     }
 }
