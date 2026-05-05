@@ -39,6 +39,9 @@ public class ClientCertValidationFilter implements Filter {
             MessageDigest md = MessageDigest.getInstance("SHA-1");
             String thumbprint = bytesToHex(md.digest(cert.getEncoded()));
 
+            System.out.println("Received Cert Thumbprint: " + thumbprint);
+            System.out.println("Expected Cert Thumbprint: " + EXPECTED_THUMBPRINT);
+
             if (EXPECTED_THUMBPRINT == null ||
                     !thumbprint.equalsIgnoreCase(EXPECTED_THUMBPRINT)) {
                 sendError(httpRes, HttpServletResponse.SC_FORBIDDEN, "Invalid certificate");
