@@ -9,14 +9,12 @@ import com.azure.storage.queue.QueueClient;
 import com.azure.storage.queue.QueueClientBuilder;
 import com.maovares.ms_products.order.application.port.out.OrderQueueSender;
 
-import jakarta.annotation.PostConstruct;
-
 @Component
 public class AzureQueueSender implements OrderQueueSender {
 
     private static final Logger logger = LoggerFactory.getLogger(AzureQueueSender.class);
 
-    @Value("${azure.storage.connection-string}")
+    @Value("${azure.storage.connection-string:}")
     private String connectionString;
 
     @Value("${azure.storage.queue-name:ordersqueue}")
@@ -24,21 +22,29 @@ public class AzureQueueSender implements OrderQueueSender {
 
     private QueueClient queueClient;
 
-    @PostConstruct
-    public void init() {
-        this.queueClient = new QueueClientBuilder()
-                .connectionString(connectionString)
-                .queueName(queueName)
-                .buildClient();
+    /**
+     * Lazy initialization — only connects when first message is sent,
+     * so the app doesn't crash on startup if the variable is missing.
+     */
+    private QueueClient getQueueClient() {
+        if (queueClient == null) {
+            if (connectionString == null || connectionString.isEmpty()) {
+                throw new RuntimeException("AZURE_STORAGE_CONNECTION_STRING is not configured");
+            }
+            this.queueClient = new QueueClientBuilder()
+                    .connectionString(connectionString)
+                    .queueName(queueName)
+                    .buildClient();
 
-        // Create the queue if it doesn't exist
-        queueClient.createIfNotExists();
-        logger.info("Azure Queue client initialized for queue: {}", queueName);
+            queueClient.createIfNotExists();
+            logger.info("Azure Queue client initialized for queue: {}", queueName);
+        }
+        return queueClient;
     }
 
     @Override
     public void sendMessage(String message) {
-        queueClient.sendMessage(message);
+        getQueueClient().sendMessage(message);
         logger.info("Message sent to Azure Queue '{}'", queueName);
     }
 }
