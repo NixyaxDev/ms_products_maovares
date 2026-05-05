@@ -15,8 +15,13 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
 public class ClientCertValidationFilter extends OncePerRequestFilter {
+
+    private static final Logger logger = LoggerFactory.getLogger(ClientCertValidationFilter.class);
 
     @Value("${CLIENT_CERT_THUMBPRINT:}")
     private String expectedThumbprint;
