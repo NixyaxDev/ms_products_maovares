@@ -13,7 +13,7 @@ public class FilterConfig {
     public FilterRegistrationBean<ClientCertValidationFilter> clientCertValidationFilter() {
         FilterRegistrationBean<ClientCertValidationFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new ClientCertValidationFilter());
-        registrationBean.addUrlPatterns("/*");
+        registrationBean.addUrlPatterns("/v1/*");
         registrationBean.setOrder(2);
         registrationBean.setName("clientCertValidationFilter");
         return registrationBean;
